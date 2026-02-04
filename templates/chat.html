@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Doctor-Patient Translation App</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .chat-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            background: #64748b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            background: #475569;
+        }
+
+        .summary-btn {
+            background: #8b5cf6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .summary-btn:hover {
+            background: #7c3aed;
+        }
+
+        .summary-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .chat-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .participant-info {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .participant {
+            flex: 1;
+        }
+
+        .participant h4 {
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .participant p {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .chat-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 75%;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.doctor {
+            align-self: flex-start;
+        }
+
+        .message.patient {
+            align-self: flex-end;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .message-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .message.doctor .message-badge {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .message.patient .message-badge {
+            background: #ede9fe;
+            color: #8b5cf6;
+        }
+
+        .message-content {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .message.doctor .message-content {
+            border-left-color: #2563eb;
+        }
+
+        .message.patient .message-content {
+            border-left-color: #8b5cf6;
+        }
+
+        .message-text {
+            margin-bottom: 0.75rem;
+        }
+
+        .message-text strong {
+            display: block;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+
+        .message-text p {
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .message-translation {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .message-translation strong {
+            display: block;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+
+        .message-translation p {
+            color: #1e293b;
+            font-style: italic;
+            margin: 0;
+        }
+
+        .input-area {
+            border-top: 2px solid #e2e8f0;
+            padding: 1.5rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .language-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .language-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .message-input-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .message-textarea {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .message-textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .send-btn {
+            background: #10b981;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: #059669;
+        }
+
+        .send-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .summary-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .summary-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            color: #2563eb;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .close-btn:hover {
+            color: #ef4444;
+        }
+
+        .modal-body {
+            line-height: 1.8;
+            color: #1e293b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-header">
+        <div class="chat-info">
+            <a href="#" id="backBtn" class="back-btn">← Back</a>
+            <span id="chatTitle">Loading...</span>
+        </div>
+        <button id="summaryBtn" class="summary-btn" disabled>📋 Summary</button>
+    </div>
+
+    <div class="chat-container">
+        <div class="participant-info" id="participantInfo">
+            <div class="participant">
+                <h4>Loading...</h4>
+                <p>...</p>
+            </div>
+        </div>
+
+        <div class="chat-box">
+            <div class="messages-area" id="messagesArea">
+                <div class="empty-state">
+                    <p>Loading messages...</p>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-row">
+                    <input 
+                        type="text" 
+                        id="languageInput" 
+                        class="language-input" 
+                        placeholder="Target language (e.g., Spanish, French)"
+                        value="Spanish"
+                    >
+                </div>
+                <div class="message-input-row">
+                    <textarea 
+                        id="messageInput" 
+                        class="message-textarea" 
+                        placeholder="Type your message..."
+                        rows="2"
+                    ></textarea>
+                    <button id="sendBtn" class="send-btn" disabled>Send ➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="summaryModal" class="summary-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Conversation Summary</h3>
+                <button class="close-btn" onclick="closeSummary()">✕</button>
+            </div>
+            <div class="modal-body" id="summaryContent">
+                Loading summary...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const conversationId = {{ conversation_id }};
+        let currentUser = null;
+        let conversation = null;
+        let messageCount = 0;
+
+        async function loadUser() {
+            try {
+                const response = await fetch('/api/user');
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = data.user;
+                    setupBackButton();
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+            }
+        }
+
+        function setupBackButton() {
+            const backBtn = document.getElementById('backBtn');
+            if (currentUser.role === 'doctor') {
+                backBtn.href = '/doctor/dashboard';
+            } else {
+                backBtn.href = '/patient/dashboard';
+            }
+        }
+
+        async function loadConversation() {
+            try {
+                const response = await fetch(`/api/conversations/${conversationId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    conversation = data.conversation;
+                    
+                    document.getElementById('chatTitle').textContent = 
+                        `Chat with ${currentUser.role === 'doctor' ? conversation.patient_name : 'Dr. ' + conversation.doctor_name}`;
+                    
+                    document.getElementById('participantInfo').innerHTML = `
+                        <div class="participant">
+                            <h4>👨‍⚕️ Doctor</h4>
+                            <p>${conversation.doctor_name}</p>
+                        </div>
+                        <div class="participant">
+                            <h4>🧑 Patient</h4>
+                            <p>${conversation.patient_name}</p>
+                        </div>
+                    `;
+                    
+                    document.getElementById('sendBtn').disabled = false;
+                } else {
+                    alert('Error: ' + data.error);
+                    window.history.back();
+                }
+            } catch (error) {
+                console.error('Error loading conversation:', error);
+            }
+        }
+
+        async function loadMessages() {
+            try {
+                const response = await fetch(`/api/conversations/${conversationId}/messages`);
+                const data = await response.json();
+
+                if (data.success) {
+                    messageCount = data.messages.length;
+                    renderMessages(data.messages);
+                    document.getElementById('summaryBtn').disabled = messageCount === 0;
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('messagesArea');
+
+            if (messages.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No messages yet. Start the conversation!</p></div>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.sender_role}`;
+
+                const date = new Date(msg.created_at).toLocaleTimeString();
+
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-badge">
+                            ${msg.sender_role === 'doctor' ? '👨‍⚕️ Doctor' : '🧑 Patient'}
+                        </span>
+                        <span>${msg.sender_name} • ${date}</span>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">
+                            <strong>Original:</strong>
+                            <p>${escapeHtml(msg.original_text)}</p>
+                        </div>
+                        ${msg.translated_text ? `
+                            <div class="message-translation">
+                                <strong>Translation (${msg.language || 'English'}):</strong>
+                                <p>${escapeHtml(msg.translated_text)}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                container.appendChild(messageDiv);
+            });
+
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = document.getElementById('messageInput').value.trim();
+            const language = document.getElementById('languageInput').value.trim() || 'English';
+
+            if (!text) return;
+
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+
+            try {
+                const response = await fetch('/api/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversation_id: conversationId,
+                        text: text,
+                        target_language: language
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('messageInput').value = '';
+                    await loadMessages();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Error sending message');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send ➤';
+            }
+        }
+
+        async function showSummary() {
+            const modal = document.getElementById('summaryModal');
+            const content = document.getElementById('summaryContent');
+            
+            modal.classList.add('show');
+            content.innerHTML = 'Generating summary...';
+
+            try {
+                const response = await fetch(`/api/conversations/${conversationId}/summary`);
+                const data = await response.json();
+
+                if (data.success) {
+                    content.innerHTML = data.summary.replace(/\n/g, '<br>');
+                } else {
+                    content.innerHTML = `<p style="color: #ef4444;">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                content.innerHTML = '<p style="color: #ef4444;">Error generating summary</p>';
+            }
+        }
+
+        function closeSummary() {
+            document.getElementById('summaryModal').classList.remove('show');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event listeners
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        document.getElementById('summaryBtn').addEventListener('click', showSummary);
+
+        // Initialize
+        async function init() {
+            await loadUser();
+            await loadConversation();
+            await loadMessages();
+
+            // Auto-refresh messages every 5 seconds
+            setInterval(loadMessages, 5000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

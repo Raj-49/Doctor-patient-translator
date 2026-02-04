@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor-Patient Translation App</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>🏥 Doctor-Patient Translation App</h1>
+        <p>Real-time medical conversation translation powered by AI</p>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="conversation-controls">
+                <button id="newConversationBtn" class="btn btn-primary">
+                    ➕ New Conversation
+                </button>
+                <button id="summaryBtn" class="btn btn-secondary" disabled>
+                    📋 Generate Summary
+                </button>
+            </div>
+
+            <!-- Conversation Selector -->
+            <div class="conversation-selector">
+                <label for="conversationList">Active Conversations:</label>
+                <select id="conversationList">
+                    <option value="">-- No conversation selected --</option>
+                </select>
+            </div>
+
+            <!-- Current Conversation Info -->
+            <div id="conversationInfo" class="conversation-info hidden">
+                <p><strong>Conversation ID:</strong> <span id="currentConversationId">-</span></p>
+                <p><strong>Messages:</strong> <span id="messageCount">0</span></p>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div id="messagesContainer" class="messages-container">
+                <div class="empty-state">
+                    <p>👋 Start a new conversation to begin</p>
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="message-input-section">
+                <div class="input-row">
+                    <select id="senderSelect" class="sender-select">
+                        <option value="doctor">👨‍⚕️ Doctor</option>
+                        <option value="patient">🧑 Patient</option>
+                    </select>
+                    
+                    <input 
+                        type="text" 
+                        id="languageInput" 
+                        class="language-input" 
+                        placeholder="Target language (e.g., Spanish)"
+                        value="Spanish"
+                    >
+                </div>
+                
+                <div class="input-row">
+                    <textarea 
+                        id="messageInput" 
+                        class="message-textarea" 
+                        placeholder="Type your message here..."
+                        rows="3"
+                    ></textarea>
+                    
+                    <button id="sendBtn" class="btn btn-send" disabled>
+                        Send ➤
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Panel -->
+        <div id="summaryPanel" class="summary-panel hidden">
+            <div class="summary-header">
+                <h3>📋 Conversation Summary</h3>
+                <button id="closeSummaryBtn" class="btn-close">✕</button>
+            </div>
+            <div id="summaryContent" class="summary-content">
+                <div class="loading">Generating summary...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by Google Gemini AI | Flask Backend | No Authentication Required</p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
