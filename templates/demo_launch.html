@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Launch - Doctor-Patient Translation App</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="landing-body">
+    <div class="landing-shell">
+        <nav class="landing-nav">
+            <div class="landing-brand">
+                <span class="landing-mark"></span>
+                Demo Launch
+            </div>
+            <div class="landing-nav-actions">
+                <a class="landing-btn landing-btn--ghost" href="/">Back to home</a>
+            </div>
+        </nav>
+
+        <main class="demo-launch">
+            <div class="demo-launch-card">
+                <h1>Interactive demo</h1>
+                <p>
+                    Use the tabs to open the doctor or patient session. The selected window will load below.
+                </p>
+                <div class="demo-tabs" role="tablist">
+                    <button class="landing-btn landing-btn--primary demo-tab" id="doctorTab" type="button">Open doctor window</button>
+                    <button class="landing-btn landing-btn--outline demo-tab" id="patientTab" type="button">Open patient window</button>
+                </div>
+                <div class="demo-frame" role="region" aria-live="polite">
+                    <iframe id="demoFrame" title="Demo window" src="{{ doctor_url }}" loading="lazy"></iframe>
+                </div>
+                <p class="demo-launch-note">
+                    Tip: Keep the language selector visible to see translation updates in real time.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const doctorUrl = "{{ doctor_url }}";
+        const patientUrl = "{{ patient_url }}";
+        const frame = document.getElementById('demoFrame');
+        const doctorTab = document.getElementById('doctorTab');
+        const patientTab = document.getElementById('patientTab');
+
+        function setActiveTab(activeTab, inactiveTab, url) {
+            activeTab.classList.add('demo-tab--active');
+            inactiveTab.classList.remove('demo-tab--active');
+            frame.src = url;
+        }
+
+        doctorTab.addEventListener('click', () => {
+            setActiveTab(doctorTab, patientTab, doctorUrl);
+        });
+
+        patientTab.addEventListener('click', () => {
+            setActiveTab(patientTab, doctorTab, patientUrl);
+        });
+
+        setActiveTab(doctorTab, patientTab, doctorUrl);
+    </script>
+</body>
+</html>

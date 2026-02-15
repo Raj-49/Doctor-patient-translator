@@ -6,17 +6,23 @@ Provides REST APIs for message translation and summarization using Google Gemini
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 import sqlite3
 import os
+import secrets
 from datetime import datetime
 import google.generativeai as genai
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+
+# Load environment variables from .env if present.
+load_dotenv()
 
 # Configuration
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 DATABASE = 'db.sqlite'
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+DEMO_TOKENS = {}
 
 # Initialize Gemini API
 if GEMINI_API_KEY:
@@ -183,6 +189,65 @@ Conversation:
     except Exception as e:
         return {"error": str(e)}
 
+def create_demo_user(role, name, email):
+    """Create or fetch a demo user for the given role."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
+    row = cursor.fetchone()
+    if row:
+        conn.close()
+        return row['id']
+
+    password_hash = generate_password_hash('demo-password-123')
+    cursor.execute('''
+        INSERT INTO users (name, email, password_hash, role)
+        VALUES (?, ?, ?, ?)
+    ''', (name, email, password_hash, role))
+    user_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return user_id
+
+def ensure_demo_conversation(doctor_id, patient_id):
+    """Create or fetch a demo conversation between the demo users."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT id FROM conversations
+        WHERE doctor_id = ? AND patient_id = ?
+    ''', (doctor_id, patient_id))
+    row = cursor.fetchone()
+    if row:
+        conn.close()
+        return row['id']
+
+    cursor.execute('''
+        INSERT INTO conversations (doctor_id, patient_id)
+        VALUES (?, ?)
+    ''', (doctor_id, patient_id))
+    conversation_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return conversation_id
+
+def login_user_by_id(user_id):
+    """Load user info into session for demo login."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT id, name, email, role FROM users WHERE id = ?', (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+
+    if not user:
+        return False
+
+    session['user_id'] = user['id']
+    session['name'] = user['name']
+    session['email'] = user['email']
+    session['role'] = user['role']
+    return True
+
 # ==================== Authentication Routes ====================
 
 @app.route('/')
@@ -193,7 +258,60 @@ def index():
             return redirect(url_for('doctor_dashboard'))
         else:
             return redirect(url_for('patient_dashboard'))
-    return redirect(url_for('login'))
+    return render_template('landing.html')
+
+@app.route('/demo')
+def demo():
+    """Launch demo by opening two windows for doctor and patient."""
+    doctor_id = create_demo_user('doctor', 'Demo Doctor', 'demo_doctor@example.com')
+    patient_id = create_demo_user('patient', 'Demo Patient', 'demo_patient@example.com')
+    conversation_id = ensure_demo_conversation(doctor_id, patient_id)
+
+    doctor_token = secrets.token_urlsafe(24)
+    patient_token = secrets.token_urlsafe(24)
+
+    DEMO_TOKENS[doctor_token] = {
+        'user_id': doctor_id,
+        'role': 'doctor',
+        'conversation_id': conversation_id
+    }
+    DEMO_TOKENS[patient_token] = {
+        'user_id': patient_id,
+        'role': 'patient',
+        'conversation_id': conversation_id
+    }
+
+    return render_template(
+        'demo_launch.html',
+        doctor_url=url_for('demo_doctor', token=doctor_token, _external=True),
+        patient_url=url_for('demo_patient', token=patient_token, _external=True)
+    )
+
+@app.route('/demo/doctor')
+def demo_doctor():
+    """Auto-login demo doctor and open the conversation."""
+    token = request.args.get('token', '')
+    token_data = DEMO_TOKENS.get(token)
+    if not token_data or token_data.get('role') != 'doctor':
+        return redirect(url_for('login'))
+
+    if not login_user_by_id(token_data['user_id']):
+        return redirect(url_for('login'))
+
+    return redirect(url_for('chat_page', conversation_id=token_data['conversation_id']))
+
+@app.route('/demo/patient')
+def demo_patient():
+    """Auto-login demo patient and open the conversation."""
+    token = request.args.get('token', '')
+    token_data = DEMO_TOKENS.get(token)
+    if not token_data or token_data.get('role') != 'patient':
+        return redirect(url_for('login'))
+
+    if not login_user_by_id(token_data['user_id']):
+        return redirect(url_for('login'))
+
+    return redirect(url_for('chat_page', conversation_id=token_data['conversation_id']))
 
 @app.route('/register')
 def register_page():

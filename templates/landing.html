@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor-Patient Translation App</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="landing-body">
+    <div class="landing-shell">
+        <nav class="landing-nav">
+            <div class="landing-brand">
+                <span class="landing-mark"></span>
+                Doctor-Patient Translation
+            </div>
+            <div class="landing-nav-actions">
+                <a class="landing-btn landing-btn--ghost" href="/login">Login</a>
+                <a class="landing-btn landing-btn--outline" href="/register">Sign up</a>
+            </div>
+        </nav>
+
+        <main class="landing-hero">
+            <div class="landing-hero-text">
+                <p class="landing-eyebrow">Clinical communication, clarified</p>
+                <h1>Translate conversations instantly and summarize care decisions.</h1>
+                <p class="landing-lede">
+                    A secure workspace for doctors and patients to collaborate across languages with
+                    real-time translation and AI-assisted summaries.
+                </p>
+                <div class="landing-cta">
+                    <a class="landing-btn landing-btn--primary" href="/login">Login</a>
+                    <a class="landing-btn landing-btn--outline" href="/register">Sign up</a>
+                    <a class="landing-btn landing-btn--ghost" href="/demo">Demo</a>
+                </div>
+                <div class="landing-meta">
+                    <div>
+                        <span class="landing-meta-title">Secure Sessions</span>
+                        <span class="landing-meta-text">Role-based access for doctors and patients.</span>
+                    </div>
+                    <div>
+                        <span class="landing-meta-title">Real-Time Translation</span>
+                        <span class="landing-meta-text">Support any language without manual handoffs.</span>
+                    </div>
+                    <div>
+                        <span class="landing-meta-title">Summary Ready</span>
+                        <span class="landing-meta-text">Capture key medical points in seconds.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="landing-hero-card">
+                <div class="landing-card-header">
+                    <span>Live Consultation</span>
+                    <span class="landing-pill">AI Summary</span>
+                </div>
+                <div class="landing-card-body">
+                    <div class="landing-message">
+                        <span class="landing-message-role">Doctor</span>
+                        <p>How are you feeling after the new medication?</p>
+                    </div>
+                    <div class="landing-message landing-message--accent">
+                        <span class="landing-message-role">Patient</span>
+                        <p>Much better. The pain is lower and I sleep easier.</p>
+                    </div>
+                    <div class="landing-summary">
+                        <p>
+                            Summary: Patient reports reduced pain and improved sleep after medication change.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <section class="landing-features">
+            <div class="landing-feature">
+                <h3>Built for clinics</h3>
+                <p>Keep each doctor-patient pair in a dedicated, persistent conversation.</p>
+            </div>
+            <div class="landing-feature">
+                <h3>Fast to adopt</h3>
+                <p>Simple signup and login. No complex setup to start translating.</p>
+            </div>
+            <div class="landing-feature">
+                <h3>Focused outcomes</h3>
+                <p>Summaries highlight concerns, symptoms, and recommendations for follow-up.</p>
+            </div>
+        </section>
+
+        <section id="demo" class="landing-demo">
+            <div class="landing-demo-text">
+                <h2>Launch the live translation demo</h2>
+                <p>
+                    Demo mode opens two concurrent windows side by side, one for the doctor and one for
+                    the patient. Type a message as the doctor and watch it auto-translate in the
+                    patient window using the selected language, no socket programming required.
+                </p>
+                <div class="landing-demo-actions">
+                    <a class="landing-btn landing-btn--primary" href="/demo">Start the demo</a>
+                    <a class="landing-btn landing-btn--ghost" href="/login">I already have access</a>
+                </div>
+            </div>
+            <div class="landing-demo-steps">
+                <div class="landing-step">
+                    <span class="landing-step-number">1</span>
+                    <div>
+                        <h4>Open doctor window</h4>
+                        <p>The demo signs in a doctor session in the left window.</p>
+                    </div>
+                </div>
+                <div class="landing-step">
+                    <span class="landing-step-number">2</span>
+                    <div>
+                        <h4>Open patient window</h4>
+                        <p>The right window signs in as the patient automatically.</p>
+                    </div>
+                </div>
+                <div class="landing-step">
+                    <span class="landing-step-number">3</span>
+                    <div>
+                        <h4>Send and translate</h4>
+                        <p>Type in one window and see the translation update in the other.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="landing-footer">
+            <p>Powered by Google Gemini AI and Flask. Designed for fast clinical collaboration.</p>
+        </footer>
+    </div>
+</body>
+</html>
