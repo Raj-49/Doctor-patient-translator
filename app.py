@@ -10,6 +10,7 @@ import secrets
 from datetime import datetime
 import google.generativeai as genai
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix
 from functools import wraps
 from dotenv import load_dotenv
 
@@ -18,8 +19,12 @@ app = Flask(__name__)
 # Load environment variables from .env if present.
 load_dotenv()
 
+# Honor reverse proxy headers (scheme/host) for correct external URLs.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 # Configuration
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['PREFERRED_URL_SCHEME'] = 'https'
 DATABASE = 'db.sqlite'
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 DEMO_TOKENS = {}
